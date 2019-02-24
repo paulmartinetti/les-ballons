@@ -11,11 +11,14 @@ homeScene.create = function () {
     let bg = this.add.sprite(0, 0, 'bg').setOrigin(0, 0).setInteractive();
 
     // load clouds - not interactive yet
-    let nuage = this.add.sprite(0,0,'nuage').setOrigin(0,0);
+    let nuage = this.add.sprite(0, 0, 'nuage').setOrigin(0, 0).setDepth(3);
+    //nuage.depth = 3;
+    // note two formats for setting depth
     let terre = this.add.sprite(0,gameH-395,'terre').setOrigin(0,0);
+    terre.depth = 2;
 
     let text = this.add.text(gameW / 2, gameH / 2, '😁 Les Ballons', {
-        font: '40px Arial',
+        font: '60px Arial',
         fill: '#ffffff',
     });
     // origin is center of text obj (note fns..setOrigin for text vs setPosition for graphics)
@@ -42,7 +45,7 @@ homeScene.create = function () {
     // include 'this' in bg Sprite methods to access/callBack homeScene
     // scope 'this' is read before the fn, even though it appears after in params
     bg.on('pointerdown', function () {
-        //this.scene.start('Game');
-        console.log('on y est');
+        this.scene.start('Game');
+        // /console.log('on y est');
     }, this);
 };

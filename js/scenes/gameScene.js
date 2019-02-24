@@ -3,115 +3,95 @@ let gameScene = new Phaser.Scene('Game');
 
 /* game flow
 *  
-*  states change - state machine
-*  1. Ready state - nothing is selected, all items ready (reset)
-*  2. Once user selects something, state changes to Selected Item
-*  3. Pet will move toward the item, so during this time block other items
-*  4. Also while rotating which takes time, block the ui
+*  
+*  1. Ballons s'elevent
+*  2. 
+*  3. 
+*  4. 
 * 
-* Ready ----> Selected Item
-*   ^         /
-*   |        /
-*   |      /
-*   v    v
-*   Blocked
+* load assets (can be accessed from different scenes)
+*   this.load.image('bg', 'assets/images/bg.png');
+*   this.load.image('terre', 'assets/images/terre.png');
+*   this.load.image('nuage', 'assets/images/nuage.png');
+*   this.load.image('foudre', 'assets/images/foudre.png');
+*   this.load.image('b1', 'assets/images/violetUp.png');
+*
+*
+*
 */
 
 // some parameters for our scene
 gameScene.init = function () {
 
+    this.gameW = this.sys.game.config.width;
+    this.gameH = this.sys.game.config.height;
+
     // game / scene stats at the beginning
-    this.stats = {
-        health: 100,
-        fun: 100
+    this.balloon = {
+        minSpeed: 0.5,
+        maxSpeed: 2,
+        minY: 0,
+        maxY: this.gameH
     };
 
-    // rate of decay / boredom
-    this.decayRates = {
-        health: -5,
-        fun: -2
-    };
+   
 };
 
 // executed once, after assets were loaded
 gameScene.create = function () {
 
-    // set bg and make interactive
-    let bg = this.add.sprite(0, 0, 'backyard').setOrigin(0, 0).setInteractive();
+    // load clouds - not interactive yet
+    let nuage = this.add.sprite(0, 0, 'nuage').setOrigin(0, 0).setDepth(30);
+    //nuage.depth = 3;
+    // note two formats for setting depth
+    let terre = this.add.sprite(0, this.gameH - 395, 'terre').setOrigin(0, 0);
+    terre.depth = 2;
 
-    // listen on bg - the 'on' fn is available after setInteractive()
-    // bc we're not changing bg, we can pass scene context 'this'
-    bg.on('pointerdown', this.placeItem, this);
-
-    // add the pet, make it interactive
-    let frameNum = 0;
-    this.pet = this.add.sprite(100, 200, 'pet', frameNum).setInteractive();
-    // apple and candy sprites are default depth 0
-    this.pet.depth = 1;
-
-    // make pet draggable
-    // access the input object of this scene
-    this.input.setDraggable(this.pet);
-
-    // define dragging fns - follow the mouse pointer
-    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-        // make sprite follow pointer
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-        // to capture the name of the object being dragged
-        //console.log(gameObject.texture.key);
-    });
-
-    // create ui
-    this.createUI();
-
-    // diplay stats - Heads-up display
-    this.createHud();
-    // show initial values
-    this.refreshHud();
-
-    // decay of health and fun over time
-    // callback is fn @ delay
-    this.timedEventStats = this.time.addEvent({
-        delay: 1000,
-        repeat: -1,
-        callback: function () {
-            // update stats (final implementation) - pass stats obj
-            this.updateStats(this.decayRates);
+    // add a few balloons at 163 x 406 each
+    // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
+    // create config ^^
+    this.balloons = this.add.group({
+        // game objects config
+        // required
+        key: 'b1',
+        // create (1 + repeat) game objects
+        repeat: 5,
+        // Actions.SetXY(gameObjects, x, y, stepX, stepY)
+        setXY: {
+            x: 0,
+            y: this.balloon.maxY,
+            stepX: 170, // step - separation between balloons
+            stepY: 100
         },
-        callbackScope: this
+        // Actions.SetScale(gameObjects, x, y, stepX, stepY)
+        setScale: {
+            x: 1,
+            y: 1,
+            stepX: 0.1,
+            stepY: 0.1
+        }
     });
+    // going up - make depths between 0 (bg) and 30 (nuage)
+    this.balloons.setDepth(1,1);
+    // reset origins
+    this.balloons.getChildren().forEach(element => {
 
+        // to make math easier, make upper left balloon origins
+        element.setOrigin(0,0);
+
+        // if we wanted all at same depth (balloons may overlap)
+        //element.setDepth(1);
+
+        // define ascending speed.
+        element.speed = this.balloon.minSpeed + 
+        Math.random() * (this.balloon.maxSpeed-this.balloon.minSpeed);
+
+    });
+    //console.log(this.balloons);
 };
 
 // fn context - Scene
 gameScene.createUI = function () {
-    // lose this
-    //let pickItem = this.pickItem;
-
-    // add buttons and make interactive
-    this.appleBtn = this.add.sprite(72, 570, 'apple').setInteractive();
-    // if you put stats here bc on() context is this Sprite
-    this.appleBtn.customStats = { health: 20, fun: 0 };
-    this.appleBtn.on('pointerdown', this.pickItem);
-
-    this.candyBtn = this.add.sprite(144, 570, 'candy').setInteractive();
-    this.candyBtn.customStats = { health: -10, fun: 10 };
-    this.candyBtn.on('pointerdown', this.pickItem);
-
-    this.toyBtn = this.add.sprite(216, 570, 'toy').setInteractive();
-    this.toyBtn.customStats = { health: 0, fun: 15 };
-    // params - pointer action, fn, context - this is Scene
-    //this.toyBtn.on('pointerdown', this.pickItem, this);
-    // params - pointer action, fn, context - default is Sprite (toy)
-    this.toyBtn.on('pointerdown', this.pickItem);
-
-    this.rotateBtn = this.add.sprite(288, 570, 'rotate').setInteractive();
-    this.rotateBtn.customStats = { fun: 20 };
-    this.rotateBtn.on('pointerdown', this.rotatePet);
-
-    // save btn array for ui control / refresh
-    this.buttonA = [this.appleBtn, this.candyBtn, this.toyBtn, this.rotateBtn];
 
     // states
     this.uiBlocked = false;
@@ -120,77 +100,13 @@ gameScene.createUI = function () {
     this.uiReady();
 };
 
-// fn context is Sprite - rotateBtn
-gameScene.rotatePet = function () {
-    // respond based on state
-    // this fn is called by button listener, so context = btn (Sprite)
-    // to access scene, need this.scene.sceneVars
-    if (this.scene.uiBlocked) return;
+gameScene.update = function(){
+    this.balloons.getChildren().forEach(element => {
 
-    // reset ui elements
-    this.scene.uiReady();
+        // to make math easier, make upper left balloon origins
+        element.y -= element.speed;
 
-    // block ui during rotation
-    this.scene.uiBlocked = true;
-
-    // 
-    this.alpha = 0.5;
-
-    // set timer
-    // fn inside fn of Sprite context - requires local var for Scene
-    //let scene = this.scene;
-    //setTimeout(function(){
-    // set scene back to ready
-    //scene.uiReady();
-    //}, 2000);
-
-    // rotation tween
-    // callbackScope - because the fn inside this object is in tween context
-    // want to increase fun, use callback to access customStats properties
-    let rotationTween = this.scene.tweens.add({
-        targets: this.scene.pet,
-        duration: 600,
-        angle: 360,
-        pause: false,
-        callbackScope: this,
-        onComplete: function (tween, sprites) {
-
-            // update stats (final implementation)
-            this.scene.updateStats(this.customStats);
-
-            // set ui to ready after fun
-            this.scene.uiReady();
-
-            //console.log(this.scene.stats);
-
-        }
     });
-
-    //console.log('rotating pet');
-};
-
-// fn context is Sprite - picking item
-gameScene.pickItem = function () {
-
-    // respond based on state
-    // this fn is called by button listener, so context = btn (Sprite)
-    // to access scene, need this.scene.sceneVars
-    if (this.scene.uiBlocked) return;
-
-    // reset ui elements
-    this.scene.uiReady();
-
-    // select item (sets var true)
-    this.scene.selectedItem = this;
-
-    // change transparency
-    this.alpha = 0.5;
-
-    // demonstrate context - clicked Sprite
-    //console.log(this.texture.key);
-    //console.log(this.customStats.health);
-
-    //console.log('picking item');
 };
 
 // fn context - Scene
@@ -198,76 +114,13 @@ gameScene.uiReady = function () {
     // nothing is being selected
     this.selectedItem = null;
 
-    // remove any transparency applied during game
-    this.buttonA.forEach(element => {
-        element.alpha = 1;
-    });
-
     // unblock ui (scene)
     this.uiBlocked = false;
 
-
-
-};
-// fn context = Scene not Sprite (bg) passed 'this' in on();
-gameScene.placeItem = function (pointer, localX, localY) {
-    // var 'pointer' shows game scene coordinates
-    // vars localX, localY show coordinates of object selected
-    // with our bg, it's the same in this case
-    //console.log(localX, localY);
-
-    // check for selected item, otherwise it's just a bg click
-    if (!this.selectedItem) return;
-
-    // ui must be unblocked
-    //if(if.uiBlocked) return;
-
-    // create a new item in the position where user clicked
-    let newItem = this.add.sprite(localX, localY, this.selectedItem.texture.key)
-
-    // block UI while pet goes to eat selectedItem
-    this.uiBlocked = true;
-
-    // move this.pet to newItem (set in create fn)
-    // onComplete is the callback fn
-    // tween is inside scene context (passed 'this' from btn)
-    let petTween = this.tweens.add({
-        targets: this.pet,
-        duration: 500,
-        x: newItem.x,
-        y: newItem.y,
-        paused: false,
-        callbackScope: this,
-        onComplete: function (tween, sprites) {
-
-            // make newItem disappear
-            newItem.destroy();
-
-            // listen for chewing to finish before unlocking ui
-            this.pet.on('animationcomplete', function () {
-
-                // put pet face back to frame 0
-                // use setFrame after obj is created (instead of .frame())
-                this.pet.setFrame(0);
-
-                // to limit placing one item, null selectedItem, reset ui
-                // this must follow stats update that needs selectedItem
-                this.uiReady();
-                // pass scene context (this)
-            }, this);
-
-            // newItem is reached, so play chewing animation
-            this.pet.play('funnyfaces');
-
-            // update stats (final implementation)
-            this.updateStats(this.selectedItem.customStats);
-
-        }
-    });
 };
 
 // heads up display
-gameScene.createHud = function () {
+/* gameScene.createHud = function () {
     // health stat
     this.healthText = this.add.text(20, 20, 'Health: ', {
         font: '24px Arial',
@@ -280,17 +133,17 @@ gameScene.createHud = function () {
         fill: '#ffffff'
     }
     );
-};
+}; */
 
 // update stats display
-gameScene.refreshHud = function () {
+/* gameScene.refreshHud = function () {
     this.healthText.setText('Health: ' + this.stats.health);
     this.funText.setText('Fun: ' + this.stats.fun);
-};
+}; */
 
 // update stats data
 // statDiff is the this.selectedItem.customStats obj
-gameScene.updateStats = function (statDiffObj) {
+/* gameScene.updateStats = function (statDiffObj) {
     // update health - bc only two properties can do manually
     //this.stats.health += statDiffObj.health;
     //this.stats.fun += statDiffObj.fun;
@@ -320,9 +173,9 @@ gameScene.updateStats = function (statDiffObj) {
 
     //
     if (isGameOver) this.gameOver();
-};
+}; */
 
-gameScene.gameOver = function () {
+/* gameScene.gameOver = function () {
 
     // block ui
     this.uiBlocked = true;
@@ -344,4 +197,4 @@ gameScene.gameOver = function () {
 
     // 
     //console.log('game over');
-};
+}; */

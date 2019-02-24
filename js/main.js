@@ -4,7 +4,7 @@
 let config = {
   type: Phaser.AUTO,
   width: 1125,
-  height: 2150,
+  height: 2100,
   scene: [bootScene, loadingScene, homeScene, gameScene],
   title: 'Sauvez Les Ballons',
   pixelArt: false,
