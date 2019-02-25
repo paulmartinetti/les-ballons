@@ -11,15 +11,14 @@ homeScene.create = function () {
     let bg = this.add.sprite(0, 0, 'ciel').setOrigin(0, 0).setInteractive();
 
     // load clouds - not interactive yet
-    let nuage = this.add.sprite(0, 0, 'nuage').setOrigin(0, 0).setDepth(3);
+    let nuage = this.add.sprite(gameW/2,0, 'nuage');
     //nuage.depth = 3;
     // note two formats for setting depth
-    let terre = this.add.sprite(0, gameH - 395, 'terre').setOrigin(0, 0);
-    terre.depth = 2;
+    let terre = this.add.sprite(0, gameH - 300, 'terre').setOrigin(0, 0);
 
     let text = this.add.text(gameW / 2, gameH / 2, 'Les Ballons\nappuie pour démarrer', {
         fontFamily: '"Lucida Console", Monaco, monospace',
-        fontSize: '60px',
+        fontSize: '40px',
         align: 'center',
         fill: '#ffffff'
     });
@@ -47,7 +46,7 @@ homeScene.create = function () {
     // include 'this' in bg Sprite methods to access/callBack homeScene
     // scope 'this' is read before the fn, even though it appears after in params
     bg.on('pointerdown', function () {
-        this.scene.start('Game');
+        this.scene.start('Watch');
         // /console.log('on y est');
     }, this);
 };

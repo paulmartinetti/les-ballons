@@ -1,5 +1,5 @@
 // create a new scene
-let gameScene = new Phaser.Scene('Game');
+let gameScene = new Phaser.Scene('Watch');
 
 /* game flow
 *  
@@ -28,14 +28,14 @@ gameScene.init = function () {
 
     // game / scene stats at the beginning
     this.lim = {
-        minSpeed: 0.5,
-        maxSpeed: 2,
+        minSpeed: 0.25,
+        maxSpeed: 1.5,
         minY: 0,
         maxY: this.gameH - 300,
         minDepth: 2,
         maxDepth: 30,
-        minScale: 0.2,
-        maxScale: 2
+        minScale: 0.1,
+        maxScale: 1
     };
 
     // balloon colors
@@ -48,11 +48,11 @@ gameScene.init = function () {
 gameScene.create = function () {
 
     // load clouds - not interactive yet
-    let nuage = this.add.sprite(0, 0, 'nuage').setOrigin(0, 0).setDepth(50);
+    let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
     //nuage.depth = 3;
     // note two formats for setting depth
-    let terre = this.add.sprite(0, this.gameH - 395, 'terre').setOrigin(0, 0);
-    terre.depth = 50;
+    let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0);
+    terre.depth = 49;
 
     // add a few balloons at 163 x 406 each
     // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
