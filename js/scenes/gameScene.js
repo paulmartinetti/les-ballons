@@ -29,7 +29,7 @@ gameScene.init = function () {
     // game / scene stats at the beginning
     this.lim = {
         minSpeed: 0.5,
-        maxSpeed: 5,
+        maxSpeed: 2,
         minY: 0,
         maxY: this.gameH - 300,
         minDepth: 2,
@@ -37,6 +37,9 @@ gameScene.init = function () {
         minScale: 0.2,
         maxScale: 2
     };
+
+    // balloon colors
+    this.colorsA = ['violet', 'jaune', 'orange'];
 
 
 };
@@ -54,34 +57,22 @@ gameScene.create = function () {
     // add a few balloons at 163 x 406 each
     // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
     // create config ^^
-    this.balloons = this.add.group([{
-        // game objects config
-        // required
-        key: 'violet',
-        // create (1 + repeat) game objects
-        repeat: 5,
-        // Actions.SetXY(gameObjects, x, y, stepX, stepY)
-        setXY: {
-            x: 10,
-            y: this.lim.maxY,
-            stepX: 150, // step - separation between balloons
-            stepY: 100
-        }
-    },
-    {
-        // game objects config
-        // required
-        key: 'jaune',
-        // create (1 + repeat) game objects
-        repeat: 5,
-        // Actions.SetXY(gameObjects, x, y, stepX, stepY)
-        setXY: {
-            x: 10,
-            y: this.lim.maxY,
-            stepX: 150, // step - separation between balloons
-            stepY: 100
-        }
-    }]);
+    let myA = [];
+    for (let i = 0; i < this.colorsA.length; i++) {
+        console.log(this.colorsA.length);
+        let obj = {
+            key: this.colorsA[i],
+            repeat: 6,
+            setXY: {
+                x: 10,
+                y: this.lim.maxY,
+                stepX: (150 + (i * 10)),
+                stepY: 100
+            }
+        };
+        myA.push(obj);
+    }
+    this.balloons = this.add.group(myA);
     // going up - make depths between 0 (bg) and 30 (nuage)
     // params = start, step
     //this.balloons.setDepth(1,1);
@@ -124,7 +115,7 @@ gameScene.update = function () {
 
         // to make math easier, make upper left balloon origins
         balloon.y -= balloon.speed;
-        if (balloon.y < -550 ) balloon.y = this.lim.maxY;
+        if (balloon.y < -650) balloon.y = this.lim.maxY;
 
     });
 
