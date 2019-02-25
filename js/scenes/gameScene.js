@@ -8,7 +8,7 @@ let gameScene = new Phaser.Scene('Game');
 *  1. nuage - 100
 *  2. ballons attérris / s'élèvent - 52-70
 *  3. terre - 51
-*  4. ballons s'eloignent 50-0 if(this.offGround)
+*  4. ballons s'eloignent 50-0 if(this.isOffGround)
 *
 *
 *
@@ -24,17 +24,24 @@ gameScene.init = function () {
     this.setup = {
         minSpeed: 0.25,
         maxSpeed: 1.25,
-        minY: this.gameH-300,
-        maxY: this.gameH-500,
+        minY: this.gameH - 100,
+        maxY: this.gameH - 500,
         minDepth: 52,
         maxDepth: 70,
         minScale: 0.5,
         maxScale: 0.9
     };
 
+    // float state FT -- > TT
+    this.float = {
+        speed: 0.25,
+        minDepth: 0,
+        maxDepth: 51
+    };
+
     // balloon colors
-    this.colorsA = ['violet', 'jaune', 'orange'];
-    
+    this.colorsA = ['violet', 'jaune', 'orange', 'vert', 'magenta'];
+
     // balloon states
     this.isFlying = false;
     this.isTouched = false;
@@ -49,6 +56,7 @@ gameScene.create = function () {
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
     //nuage.depth = 3;
+
     // note two formats for setting depth
     let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0);
     terre.depth = 51;
@@ -59,16 +67,10 @@ gameScene.create = function () {
     let myA = [];
     let len = this.colorsA.length;
     for (let i = 0; i < len; i++) {
-        console.log(this.colorsA.length);
+        //console.log(this.colorsA.length);
         let obj = {
             key: this.colorsA[i],
-            repeat: 4,
-            setXY: {
-                x: 10,
-                y: this.setup.maxY,
-                stepX: (150 + (i * 10)),
-                stepY: 100
-            }
+            repeat: 2
         };
         myA.push(obj);
     }
@@ -80,7 +82,7 @@ gameScene.create = function () {
     // 
     this.balloons.getChildren().forEach(balloon => {
         // to make math easier, make upper left balloon origins
-        balloon.setOrigin(0, 0);
+        //balloon.setOrigin(0, 0);
 
         // define ascending speed
         let tempR = Math.round(Math.random() * 100) / 100;
@@ -95,9 +97,10 @@ gameScene.create = function () {
         //console.log(balloon.scaleX);
 
         // define depth based on speed
-        balloon.setDepth(this.setup.minDepth + tempR * (this.setup.maxDepth - this.setup.minDepth));
+        balloon.setDepth(this.setup.maxDepth - tempR * (this.setup.maxDepth - this.setup.minDepth));
         // define depth based on speed
         balloon.y = this.setup.minY + tempR * (this.setup.maxY - this.setup.minY);
+        balloon.x = Math.round(80+Math.random() * this.gameW);
 
         balloon.isFlying = false;
         balloon.isTouched = false;
@@ -110,7 +113,7 @@ gameScene.create = function () {
 
     });
 };
-gameScene.liftOff = function(){
+gameScene.liftOff = function () {
     this.isFlying = true;
 };
 
@@ -133,7 +136,7 @@ gameScene.update = function () {
 
         // to make math easier, make upper left balloon origins
         balloon.y -= balloon.speed;
-        if (balloon.y < -650) balloon.y = this.setup.maxY;
+        if (balloon.y < -1000) balloon.isFlying = false;
 
     });
 

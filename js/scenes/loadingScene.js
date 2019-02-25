@@ -46,12 +46,14 @@ loadingScene.preload = function () {
 
     // load assets (can be accessed from different scenes)
     this.load.image('ciel', 'assets/images2/ciel.png');
-    this.load.image('terre', 'assets/images2/terre.png');
+    this.load.image('terre', 'assets/images2/terre2.png');
     this.load.image('nuage', 'assets/images2/nuage.png');
     //this.load.image('foudre', 'assets/images2/foudre.png');
     this.load.image('violet', 'assets/images2/violet.png');
     this.load.image('jaune', 'assets/images2/jaune.png');
     this.load.image('orange', 'assets/images2/orange.png');
+    this.load.image('vert', 'assets/images2/vert.png');
+    this.load.image('magenta', 'assets/images2/magenta.png');
 
     // load character spritesheet
     /* this.load.spritesheet('pet', 'assets/images/pet.png', {
