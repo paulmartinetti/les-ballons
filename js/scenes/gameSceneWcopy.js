@@ -1,14 +1,20 @@
 // create a new scene
-let gameScene = new Phaser.Scene('Game');
+let gameScene = new Phaser.Scene('Watch');
 
 /* game flow
 *  
-*  Depths
-*  1. ciel - 100
-*  2. ballons attérris / s'élèvent - 55, 60, 65, 70, 75
-*  3. terre - 51
-*  4. ballons s'eloignent 50-0 if(this.offGround)
+*  
+*  1. Ballons s'elevent
+*  2. 
+*  3. 
+*  4. 
 * 
+* load assets (can be accessed from different scenes)
+*   this.load.image('bg', 'assets/images/bg.png');
+*   this.load.image('terre', 'assets/images/terre.png');
+*   this.load.image('nuage', 'assets/images/nuage.png');
+*   this.load.image('foudre', 'assets/images/foudre.png');
+*   this.load.image('b1', 'assets/images/violetUp.png');
 *
 *
 *
@@ -21,50 +27,21 @@ gameScene.init = function () {
     this.gameH = this.sys.game.config.height;
 
     // game / scene stats at the beginning
-    this.setup = {
+    this.lim = {
         minSpeed: 0.25,
         maxSpeed: 1.5,
         minY: 0,
         maxY: this.gameH - 300,
-        minDepth: 0,
+        minDepth: 2,
         maxDepth: 30,
         minScale: 0.1,
         maxScale: 1
     };
 
-    // balloon colors, 283x519
-    this.colorsA = ['violet', 'jaune', 'orange', 'jaune', 'orange'];
+    // balloon colors
+    this.colorsA = ['violet', 'jaune', 'orange'];
 
-    // balloon states
-    this.isFlying = false;
-    this.isTouched = false;
-    // set by y
-    this.isOffGround = false;
 
-    /**************** ballons setup on the ground ********************/
-    this.setupA = [];
-    // depth will be 50, 55, 60, 65, 70
-    let dStep = 5;
-    // scale will be 0.7, 0.75, 0.8, 0.85, 0.9 
-    let sStep = 0.05;
-    // starting y will be 50, 100, 150, 200, 250
-    // terre is h: 300
-    let yStep = 50;
-    // starting speed will be 0.25, 0.5, 0.75, 1, 1.25
-    let spStep = 0.25;
-    // non rnd selection of indices
-    this.rand = [3, 1, 4, 0, 2];
-    // create array of objs to be used to init balloons sur terre
-    for (let i = 0; i < 5; i++) {
-        let obj = {
-            depth: 50 + dStep,
-            scale: 0.65 + sStep,
-            speed: spStep,
-            y: this.gameH-300+yStep
-        };
-        this.setupA.push(obj);
-        dStep += 5; sStep += 0.05; yStep += 50; spStep+=0.25;
-    }
 };
 
 // executed once, after assets were loaded
@@ -72,51 +49,54 @@ gameScene.create = function () {
 
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
-
     //nuage.depth = 3;
     // note two formats for setting depth
     let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0);
-    terre.depth = 51;
+    terre.depth = 49;
 
     // add a few balloons at 163 x 406 each
     // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
     // create config ^^
     let myA = [];
-    let len = this.colorsA.length;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < this.colorsA.length; i++) {
+        console.log(this.colorsA.length);
         let obj = {
             key: this.colorsA[i],
-            repeat: 2,
+            repeat: 6,
             setXY: {
                 x: 10,
-                y: this.setupA[this.rand[i]].y,
-                stepX: 200,
-                stepY: 0
+                y: this.lim.maxY,
+                stepX: (150 + (i * 10)),
+                stepY: 100
             }
         };
         myA.push(obj);
-        console.log(myA);
     }
     this.balloons = this.add.group(myA);
     // going up - make depths between 0 (bg) and 30 (nuage)
     // params = start, step
     //this.balloons.setDepth(1,1);
 
-    //
-    let balloonA = this.balloons.getChildren();
-
-    for (let j=0;j<len;j++){
-        
-        balloonA[j].setScale(this.setupA[this.rand[j]], this.setupA[this.rand[j]]);
-        //console.log(balloon.scaleX);
-
-        // define depth based on speed
-        balloon.setDepth();
-
+    // 
+    this.balloons.getChildren().forEach(balloon => {
         // to make math easier, make upper left balloon origins
         balloon.setOrigin(0, 0);
-    }
-    //console.log(this.balloons.getChildren());
+
+        // define ascending speed
+        let tempR = Math.round(Math.random() * 100) / 100;
+        //console.log(tempR);
+        //
+        balloon.speed = this.lim.minSpeed +
+            tempR * (this.lim.maxSpeed - this.lim.minSpeed);
+
+        // slower balloons are also smaller
+        let tempS = this.lim.minScale + tempR * (this.lim.maxScale - this.lim.minScale);
+        balloon.setScale(tempS, tempS);
+        console.log(balloon.scaleX);
+
+        // define depth based on speed
+        balloon.setDepth(this.lim.minDepth + tempR * (this.lim.maxDepth - this.lim.minDepth));
+    });
 };
 
 // fn context - Scene

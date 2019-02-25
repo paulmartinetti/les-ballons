@@ -46,7 +46,8 @@ homeScene.create = function () {
     // include 'this' in bg Sprite methods to access/callBack homeScene
     // scope 'this' is read before the fn, even though it appears after in params
     bg.on('pointerdown', function () {
-        this.scene.start('Watch');
+        this.scene.start('Game');
+        //this.scene.start('Watch');
         // /console.log('on y est');
     }, this);
 };
