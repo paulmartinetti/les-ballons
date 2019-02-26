@@ -22,13 +22,13 @@ gameScene.init = function () {
 
     // game / scene stats at the beginning
     this.setup = {
-        minSpeed: 0.25,
+        minSpeed: 0.5,
         maxSpeed: 1.25,
-        minY: this.gameH - 100,
-        maxY: this.gameH - 500,
+        minY: this.gameH - 500,
+        maxY: this.gameH - 100,
         minDepth: 52,
         maxDepth: 70,
-        minScale: 0.5,
+        minScale: 0.7,
         maxScale: 0.9
     };
 
@@ -36,11 +36,12 @@ gameScene.init = function () {
     this.float = {
         speed: 0.25,
         minDepth: 0,
-        maxDepth: 51
+        maxDepth: 51,
+        minY: this.gameH - 500
     };
 
     // balloon colors
-    this.colorsA = ['violet', 'jaune', 'orange', 'vert', 'magenta'];
+    this.colorsA = ['violet', 'jaune', 'orange', 'vert', 'rouge'];
 
     // balloon states
     this.isFlying = false;
@@ -75,7 +76,7 @@ gameScene.create = function () {
         myA.push(obj);
     }
     this.balloons = this.add.group(myA);
-    // going up - make depths between 0 (bg) and 30 (nuage)
+
     // params = start, step
     //this.balloons.setDepth(1,1);
 
@@ -97,14 +98,14 @@ gameScene.create = function () {
         //console.log(balloon.scaleX);
 
         // define depth based on speed
-        balloon.setDepth(this.setup.maxDepth - tempR * (this.setup.maxDepth - this.setup.minDepth));
+        balloon.setDepth(this.setup.minDepth + tempR * (this.setup.maxDepth - this.setup.minDepth));
         // define depth based on speed
         balloon.y = this.setup.minY + tempR * (this.setup.maxY - this.setup.minY);
-        balloon.x = Math.round(80+Math.random() * this.gameW);
+        balloon.x = Math.round(80 + Math.random() * this.gameW);
 
+        // starting off FF
         balloon.isFlying = false;
         balloon.isTouched = false;
-        // set by y
         balloon.isOffGround = false;
 
         // set interactive.
@@ -114,7 +115,13 @@ gameScene.create = function () {
     });
 };
 gameScene.liftOff = function () {
-    this.isFlying = true;
+    // if FF, make TF
+    if (!this.isFlying && !this.isTouched) {
+        this.isFlying = true;
+        return;
+    }
+
+    if (this.isFlying && !this.isTouched && this.y < this.scene.float.minY) this.isTouched = true;
 };
 
 
@@ -131,12 +138,23 @@ gameScene.createUI = function () {
 gameScene.update = function () {
 
     this.balloons.getChildren().forEach(balloon => {
+        // if too high, reset
+        if (balloon.y < -1000) balloon.isFlying = balloon.isTouched = false;
 
-        if (!balloon.isFlying) return;
+        // TF
+        if (balloon.isFlying && !balloon.isTouched) {
+            // to make math easier, make upper left balloon origins
+            balloon.y -= balloon.speed;
+        }
 
-        // to make math easier, make upper left balloon origins
-        balloon.y -= balloon.speed;
-        if (balloon.y < -1000) balloon.isFlying = false;
+        // TT
+        if (balloon.isFlying && balloon.isTouched) {
+            // to make math easier, make upper left balloon origins
+            balloon.y -= this.float.speed;
+            balloon.setDepth(5);
+            balloon.setScale(balloon.scaleX * 0.999);
+            console.log('2nd');
+        }
 
     });
 

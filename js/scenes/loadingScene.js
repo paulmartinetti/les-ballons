@@ -53,7 +53,7 @@ loadingScene.preload = function () {
     this.load.image('jaune', 'assets/images2/jaune.png');
     this.load.image('orange', 'assets/images2/orange.png');
     this.load.image('vert', 'assets/images2/vert.png');
-    this.load.image('magenta', 'assets/images2/magenta.png');
+    this.load.image('rouge', 'assets/images2/rouge.png');
 
     // load character spritesheet
     /* this.load.spritesheet('pet', 'assets/images/pet.png', {
