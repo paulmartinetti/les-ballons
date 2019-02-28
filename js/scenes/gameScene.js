@@ -24,7 +24,7 @@ gameScene.init = function () {
     this.setup = {
         minSpeed: 0.5,
         maxSpeed: 1.25,
-        minY: this.gameH - 300,
+        minY: this.gameH - 500,
         maxY: this.gameH - 100,
         minDepth: 52,
         maxDepth: 70,
@@ -36,8 +36,7 @@ gameScene.init = function () {
     this.float = {
         speed: 0.25,
         minDepth: 0,
-        maxDepth: 51,
-        minY: this.gameH - 500
+        maxDepth: 51
     };
 
     // balloon colors
@@ -63,8 +62,8 @@ gameScene.create = function () {
     //nuage.depth = 100;
 
     // add color selector
-    let colors = this.add.sprite(this.gameW / 2, this.gameH - 29.5, 'colors', 4).setInteractive().setDepth(101);
-    colors.angle = -90;
+    let colors = this.add.sprite(29.5, this.gameH-300, 'colors', 4).setInteractive().setDepth(101);
+    //colors.angle = -90;this.gameW / 2this.gameH - 29.5
     colors.on('pointerdown', function (pointer, localX, localY) {
         let step = 58;
         for (let i = 0; i < this.colorsA.length; i++) {
@@ -117,8 +116,11 @@ gameScene.liftOff = function () {
         this.isFlying = true;
         return;
     }
-
-    if (this.isFlying && !this.isTouched && this.y < this.scene.float.minY) this.isTouched = true;
+    // if safe make TT
+    let bRect = this.getBounds();
+    let tRect = this.scene.terre.getBounds();
+    if (this.isFlying && !this.isTouched && 
+        !Phaser.Geom.Intersects.RectangleToRectangle(bRect, tRect)) this.isTouched = true;
 };
 
 gameScene.update = function () {

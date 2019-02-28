@@ -1,7 +1,8 @@
 
 // our game's configuration
 // backgroundColor - game only
-// reduced height by 100 (from 1136)
+// original reduced height by 100 (from 1136)
+
 let config = {
   type: Phaser.AUTO,
   width: 640,
@@ -11,6 +12,7 @@ let config = {
   pixelArt: false,
   backgroundColor: '6666FF'
 };
+
 
 // create the game, and pass it the configuration
 let game = new Phaser.Game(config);
