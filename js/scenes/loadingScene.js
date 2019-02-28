@@ -45,15 +45,27 @@ loadingScene.preload = function () {
 
 
     // load assets (can be accessed from different scenes)
-    this.load.image('ciel', 'assets/images2/ciel.png');
-    this.load.image('terre', 'assets/images2/terre2.png');
-    this.load.image('nuage', 'assets/images2/nuage.png');
-    //this.load.image('foudre', 'assets/images2/foudre.png');
-    this.load.image('violet', 'assets/images2/violet.png');
-    this.load.image('jaune', 'assets/images2/jaune.png');
-    this.load.image('orange', 'assets/images2/orange.png');
-    this.load.image('vert', 'assets/images2/vert.png');
-    this.load.image('rouge', 'assets/images2/rouge.png');
+    this.load.image('ciel', 'assets/images/ciel.png');
+    this.load.image('terre', 'assets/images/terre2.png');
+    this.load.image('nuage', 'assets/images/nuage.png');
+    //this.load.image('foudre', 'assets/images/foudre.png');
+    this.load.image('violet', 'assets/images/violet.png');
+    this.load.image('jaune', 'assets/images/jaune.png');
+    this.load.image('orange', 'assets/images/orange.png');
+    this.load.image('vert', 'assets/images/vert.png');
+    this.load.image('rouge', 'assets/images/rouge.png');
+
+    //https://github.com/photonstorm/phaser/blob/master/src/textures/parsers/SpriteSheet.js
+    // need to turn -90 degrees
+    this.load.spritesheet('colors', 'assets/images/btns291.png', {
+        frameWidth: 57,
+        frameHeight: 289,
+        startFrame: 0,
+        endFrame: 4,
+        margin: 1,
+        spacing: 1,
+        frameNum: 4
+    });
 
     // load character spritesheet
     /* this.load.spritesheet('pet', 'assets/images/pet.png', {

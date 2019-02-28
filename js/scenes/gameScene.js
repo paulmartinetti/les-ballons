@@ -41,7 +41,7 @@ gameScene.init = function () {
     };
 
     // balloon colors
-    this.colorsA = ['violet', 'jaune', 'orange', 'vert', 'rouge'];
+    this.colorsA = ['violet', 'rouge', 'vert', 'jaune', 'orange'];
 
     // balloon states
     this.isFlying = false;
@@ -56,16 +56,34 @@ gameScene.create = function () {
 
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
-    //nuage.depth = 3;
+    //nuage.depth = 100;
 
     // note two formats for setting depth
-    let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0);
-    terre.depth = 51;
+    let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0).setDepth(51);
+    //terre.depth = 51;
+
+    // add color selector
+    let colors = this.add.sprite(this.gameW/2, this.gameH - 29.5, 'colors', 4).setInteractive().setDepth(101);
+    colors.angle = -90;
+    colors.on('pointerdown', function (pointer, localX, localY) {
+        let step = 58;
+        for (let i = 0; i < this.colorsA.length; i++) {
+            //console.log(Math.round(localY) - step);
+            if (localY - step < 0) {                
+                colors.setFrame(i);
+                break;
+            } else {
+                step += 58;
+            }
+            
+        }
+    },this);
+
 
     // add a few balloons at 163 x 406 each
     // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
     // create config ^^
-    let myA = [];
+    /* let myA = [];
     let len = this.colorsA.length;
     for (let i = 0; i < len; i++) {
         //console.log(this.colorsA.length);
@@ -75,13 +93,13 @@ gameScene.create = function () {
         };
         myA.push(obj);
     }
-    this.balloons = this.add.group(myA);
+    this.balloons = this.add.group(myA); */
 
     // params = start, step
     //this.balloons.setDepth(1,1);
 
     // 
-    this.balloons.getChildren().forEach(balloon => {
+    /* this.balloons.getChildren().forEach(balloon => {
         // to make math easier, make upper left balloon origins
         //balloon.setOrigin(0, 0);
 
@@ -112,7 +130,7 @@ gameScene.create = function () {
         balloon.setInteractive();
         balloon.on('pointerdown', this.liftOff);
 
-    });
+    }); */
 };
 gameScene.liftOff = function () {
     // if FF, make TF
@@ -125,17 +143,8 @@ gameScene.liftOff = function () {
 };
 
 
-// fn context - Scene
-gameScene.createUI = function () {
 
-    // states
-    this.uiBlocked = false;
-
-    // refresh in case of previous run
-    this.uiReady();
-};
-
-gameScene.update = function () {
+/* gameScene.update = function () {
 
     this.balloons.getChildren().forEach(balloon => {
         // if too high, reset
@@ -158,7 +167,7 @@ gameScene.update = function () {
 
     });
 
-};
+}; */
 
 // fn context - Scene
 gameScene.uiReady = function () {
