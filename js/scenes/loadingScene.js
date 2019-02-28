@@ -5,7 +5,7 @@ let loadingScene = new Phaser.Scene('Loading');
 // load asset files for our game
 // ALL scenes have access to these objects!
 loadingScene.preload = function () {
-
+    
     // 
     let gameW = this.sys.game.config.width;
     let gameH = this.sys.game.config.height;

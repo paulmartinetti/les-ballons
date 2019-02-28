@@ -24,7 +24,7 @@ gameScene.init = function () {
     this.setup = {
         minSpeed: 0.5,
         maxSpeed: 1.25,
-        minY: this.gameH - 500,
+        minY: this.gameH - 300,
         maxY: this.gameH - 100,
         minDepth: 52,
         maxDepth: 70,
@@ -89,7 +89,7 @@ gameScene.create = function () {
         // user adds balloons one at a time
         //let balloon = this.add.sprite(localX, localY, this.colorsA[this.curColorInd]);
         let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd]);
-        console.log(balloon.y);
+        //console.log(balloon.y);
         // depth is greater closer
         balloon.setDepth(this.setup.minDepth);
         // scale is greater closer
@@ -124,7 +124,7 @@ gameScene.liftOff = function () {
 gameScene.update = function () {
 
     this.balloonA.forEach(balloon => {
-        console.log(this.balloonA.length);
+        //console.log(this.balloonA.length);
         // if too high, reset
         if (balloon.y < -1000) balloon.isFlying = balloon.isTouched = false;
 
@@ -141,7 +141,7 @@ gameScene.update = function () {
             balloon.y -= this.float.speed;
             balloon.setDepth(5);
             balloon.setScale(balloon.scaleX * 0.999);
-            console.log('2nd');
+            //console.log('2nd');
         }
 
     });
