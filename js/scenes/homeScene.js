@@ -11,12 +11,12 @@ homeScene.create = function () {
     let bg = this.add.sprite(0, 0, 'ciel').setOrigin(0, 0).setInteractive();
 
     // load clouds - not interactive yet
-    let nuage = this.add.sprite(gameW/2,0, 'nuage');
+    //let nuage = this.add.sprite(gameW/2,0, 'nuage');
     //nuage.depth = 3;
     // note two formats for setting depth
-    let terre = this.add.sprite(0, gameH - 300, 'terre').setOrigin(0, 0);
+    //let terre = this.add.sprite(0, gameH - 300, 'terre').setOrigin(0, 0);
 
-    let text = this.add.text(gameW / 2, gameH / 2, 'Les Ballons\nappuie pour démarrer', {
+    let text = this.add.text(gameW / 2, gameH / 2, 'Launch Balloons \n Click to start', {
         fontFamily: '"Lucida Console", Monaco, monospace',
         fontSize: '40px',
         align: 'center',
