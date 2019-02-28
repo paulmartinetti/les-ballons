@@ -42,12 +42,16 @@ gameScene.init = function () {
 
     // balloon colors
     this.colorsA = ['violet', 'rouge', 'vert', 'jaune', 'orange'];
+    this.curColorInd = 4;
 
     // balloon states
     this.isFlying = false;
     this.isTouched = false;
     // set by y
     this.isOffGround = false;
+
+    // balloons
+    this.balloonA = [];
 
 };
 
@@ -58,81 +62,56 @@ gameScene.create = function () {
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
     //nuage.depth = 100;
 
-    // note two formats for setting depth
-    let terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0).setDepth(51);
-    //terre.depth = 51;
-
     // add color selector
-    let colors = this.add.sprite(this.gameW/2, this.gameH - 29.5, 'colors', 4).setInteractive().setDepth(101);
+    let colors = this.add.sprite(this.gameW / 2, this.gameH - 29.5, 'colors', 4).setInteractive().setDepth(101);
     colors.angle = -90;
     colors.on('pointerdown', function (pointer, localX, localY) {
         let step = 58;
         for (let i = 0; i < this.colorsA.length; i++) {
             //console.log(Math.round(localY) - step);
-            if (localY - step < 0) {                
+            if (localY - step < 0) {
                 colors.setFrame(i);
+                this.curColorInd = i;
                 break;
             } else {
                 step += 58;
             }
-            
+
         }
-    },this);
+    }, this);
 
-
-    // add a few balloons at 163 x 406 each
-    // https://github.com/photonstorm/phaser/blob/master/src/gameobjects/group/typedefs/GroupCreateConfig.js
-    // create config ^^
-    /* let myA = [];
-    let len = this.colorsA.length;
-    for (let i = 0; i < len; i++) {
-        //console.log(this.colorsA.length);
-        let obj = {
-            key: this.colorsA[i],
-            repeat: 2
-        };
-        myA.push(obj);
-    }
-    this.balloons = this.add.group(myA); */
-
-    // params = start, step
-    //this.balloons.setDepth(1,1);
-
-    // 
-    /* this.balloons.getChildren().forEach(balloon => {
-        // to make math easier, make upper left balloon origins
-        //balloon.setOrigin(0, 0);
-
-        // define ascending speed
-        let tempR = Math.round(Math.random() * 100) / 100;
-        //console.log(tempR);
-        //
+    // set bg and make interactive
+    // note two formats for setting depth
+    this.terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0).setDepth(51).setInteractive();
+    //terre.depth = 51;
+    this.terre.on('pointerdown', function (pointer, localX, localY) {
+        let closenessPct = localY / this.terre.displayHeight;
+        // user adds balloons one at a time
+        //let balloon = this.add.sprite(localX, localY, this.colorsA[this.curColorInd]);
+        let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd]);
+        console.log(balloon.y);
+        // depth is greater closer
+        balloon.setDepth(this.setup.minDepth);
+        // scale is greater closer
+        balloon.setScale(this.setup.minScale + ((closenessPct) * (this.setup.maxScale - this.setup.minScale)));
+        // set speed greater is closer
         balloon.speed = this.setup.minSpeed +
-            tempR * (this.setup.maxSpeed - this.setup.minSpeed);
-
-        // slower balloons are also smaller
-        let tempS = this.setup.minScale + tempR * (this.setup.maxScale - this.setup.minScale);
-        balloon.setScale(tempS, tempS);
-        //console.log(balloon.scaleX);
-
-        // define depth based on speed
-        balloon.setDepth(this.setup.minDepth + tempR * (this.setup.maxDepth - this.setup.minDepth));
-        // define depth based on speed
-        balloon.y = this.setup.minY + tempR * (this.setup.maxY - this.setup.minY);
-        balloon.x = Math.round(80 + Math.random() * this.gameW);
-
+            closenessPct * (this.setup.maxSpeed - this.setup.minSpeed);
         // starting off FF
         balloon.isFlying = false;
         balloon.isTouched = false;
         balloon.isOffGround = false;
 
+        // add to group
+        this.balloonA.push(balloon);
+
         // set interactive.
         balloon.setInteractive();
         balloon.on('pointerdown', this.liftOff);
-
-    }); */
+    },this);
 };
 gameScene.liftOff = function () {
+    this.isFlying = true;
     // if FF, make TF
     if (!this.isFlying && !this.isTouched) {
         this.isFlying = true;
@@ -142,11 +121,10 @@ gameScene.liftOff = function () {
     if (this.isFlying && !this.isTouched && this.y < this.scene.float.minY) this.isTouched = true;
 };
 
+gameScene.update = function () {
 
-
-/* gameScene.update = function () {
-
-    this.balloons.getChildren().forEach(balloon => {
+    this.balloonA.forEach(balloon => {
+        console.log(this.balloonA.length);
         // if too high, reset
         if (balloon.y < -1000) balloon.isFlying = balloon.isTouched = false;
 
@@ -154,6 +132,7 @@ gameScene.liftOff = function () {
         if (balloon.isFlying && !balloon.isTouched) {
             // to make math easier, make upper left balloon origins
             balloon.y -= balloon.speed;
+            
         }
 
         // TT
@@ -167,7 +146,7 @@ gameScene.liftOff = function () {
 
     });
 
-}; */
+};
 
 // fn context - Scene
 gameScene.uiReady = function () {
