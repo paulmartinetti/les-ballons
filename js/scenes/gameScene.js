@@ -24,12 +24,10 @@ gameScene.init = function () {
     this.setup = {
         minSpeed: 0.5,
         maxSpeed: 1.25,
-        minY: this.gameH - 500,
-        maxY: this.gameH - 100,
         minDepth: 52,
         maxDepth: 70,
-        minScale: 0.7,
-        maxScale: 0.9
+        minScale: 0.6,
+        maxScale: 1
     };
 
     // float state FT -- > TT
@@ -85,9 +83,10 @@ gameScene.create = function () {
     //terre.depth = 51;
     this.terre.on('pointerdown', function (pointer, localX, localY) {
         let closenessPct = localY / this.terre.displayHeight;
-        // user adds balloons one at a time
+        // user adds balloons one at a time - 283w x 519h
         //let balloon = this.add.sprite(localX, localY, this.colorsA[this.curColorInd]);
-        let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd]);
+        // setOrigin(bottom middle);
+        let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd]).setOrigin(0.5,0.9);
         //console.log(balloon.y);
         // depth is greater closer
         balloon.setDepth(this.setup.minDepth);
@@ -149,93 +148,3 @@ gameScene.update = function () {
     });
 
 };
-
-// fn context - Scene
-gameScene.uiReady = function () {
-    // nothing is being selected
-    this.selectedItem = null;
-
-    // unblock ui (scene)
-    this.uiBlocked = false;
-
-};
-
-// heads up display
-/* gameScene.createHud = function () {
-    // health stat
-    this.healthText = this.add.text(20, 20, 'Health: ', {
-        font: '24px Arial',
-        fill: '#ffffff'
-    }
-    );
-    // fun stat
-    this.funText = this.add.text(170, 20, 'Fun: ', {
-        font: '24px Arial',
-        fill: '#ffffff'
-    }
-    );
-}; */
-
-// update stats display
-/* gameScene.refreshHud = function () {
-    this.healthText.setText('Health: ' + this.stats.health);
-    this.funText.setText('Fun: ' + this.stats.fun);
-}; */
-
-// update stats data
-// statDiff is the this.selectedItem.customStats obj
-/* gameScene.updateStats = function (statDiffObj) {
-    // update health - bc only two properties can do manually
-    //this.stats.health += statDiffObj.health;
-    //this.stats.fun += statDiffObj.fun;
-    //
-    //console.log(this.stats.health);
-    let isGameOver = false;
-
-    // update health if there are lots of inconsistent properties
-    // e.g. some don't have health, some don't have fun..
-    // the var 'stat' is like each or index, made-up
-    for (stat in statDiffObj) {
-        // if property is only in selectedItem...
-        // to avoid inherited properties from __prototype__
-        if (statDiffObj.hasOwnProperty(stat)) {
-            // increment
-            this.stats[stat] += statDiffObj[stat];
-
-            // prevent stats from below 0
-            if (this.stats[stat] < 0) {
-                isGameOver = true;
-                this.stats[stat] = 0;
-            }
-        }
-    }
-    // refresh hud
-    this.refreshHud();
-
-    //
-    if (isGameOver) this.gameOver();
-}; */
-
-/* gameScene.gameOver = function () {
-
-    // block ui
-    this.uiBlocked = true;
-
-    // change the frame of the pet to dead
-    this.pet.setFrame(4);
-
-    // scope inside fn is the fn
-    // to access scene to restart, use callbackScope 'this'
-    this.time.addEvent({
-        delay: 2000,
-        repeat: 0,
-        callback: function () {
-            // restart scene
-            this.scene.start('Home');
-        },
-        callbackScope: this
-    });
-
-    //
-    //console.log('game over');
-}; */
