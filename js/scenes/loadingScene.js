@@ -50,7 +50,7 @@ loadingScene.preload = function () {
     this.load.image('ciel', 'assets/images/ciel.png');
     this.load.image('terre', 'assets/images/terre2.png');
     this.load.image('nuage', 'assets/images/nuage.png');
-    //this.load.image('foudre', 'assets/images/foudre.png');
+    this.load.image('foudre', 'assets/images/foudre.png');
     //this.load.image('violet', 'assets/images/violet.png');
     //this.load.image('jaune', 'assets/images/jaune.png');
     //this.load.image('orange', 'assets/images/orange.png');

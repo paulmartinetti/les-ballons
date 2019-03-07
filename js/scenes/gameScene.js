@@ -8,7 +8,7 @@ let gameScene = new Phaser.Scene('Game');
 *  1. nuage - 100
 *  2. ballons attérris / s'élèvent - 52-70
 *  3. terre - 51
-*  4. ballons s'eloignent 50-0 if(this.isOffGround)
+*  4. ballons s'eloignent 50-0
 *
 *
 *
@@ -46,7 +46,7 @@ gameScene.init = function () {
     this.isSafe = false;
     this.isTouched = false;
     // set by y
-    this.isOffGround = false;
+    this.isFalling = false;
 
     // balloons
     this.balloonA = [];
@@ -58,6 +58,8 @@ gameScene.create = function () {
 
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
+    this.foudre = this.add.sprite(this.gameW / 2, 100, 'foudre').setDepth(99);
+    this.foudre.visible = false;
     //nuage.depth = 100;
 
     // add color selector
@@ -100,7 +102,7 @@ gameScene.create = function () {
         balloon.isSafe = false;
         balloon.isFlying = false;
         balloon.isTouched = false;
-        balloon.isOffGround = false;
+        balloon.isFalling = false;
 
         // add to group
         this.balloonA.push(balloon);
@@ -111,9 +113,13 @@ gameScene.create = function () {
     }, this);
 };
 gameScene.liftOff = function () {
-   
+
     // first click
-    this.isFlying = true;
+    if (!this.isFlying && !this.isFalling) {
+        this.isFlying = true;
+        this.setFrame(0);
+    }
+
 
     // clicks when safe sets float
     if (this.isSafe && !this.isTouched) {
@@ -138,7 +144,7 @@ gameScene.update = function () {
             if (!Phaser.Geom.Intersects.RectangleToRectangle(bRect, tRect)) {
                 balloon.isSafe = true;
                 balloon.setFrame(1);
-            } 
+            }
 
         }
         // if safe make TT
@@ -146,6 +152,11 @@ gameScene.update = function () {
         if (balloon.isFlying && balloon.isSafe && !balloon.isTouched) {
             // check for safety
             balloon.y -= balloon.speed;
+            // but if user ignores balloon --
+            if (balloon.y < 300) {
+                balloon.isFalling = true;
+                this.foudre.visible = true;
+            }
         }
 
         // TT
@@ -155,6 +166,21 @@ gameScene.update = function () {
             balloon.setDepth(5);
             balloon.setScale(balloon.scaleX * 0.999);
             //console.log('2nd');
+        }
+        // falling animation
+        if (balloon.isFalling) {
+            // check for safety
+            balloon.setFrame(2);
+            balloon.y += 3;
+            // once it hits ground
+            if (balloon.y > 950) {
+                balloon.setFrame(3);
+                balloon.isFlying = false;
+                balloon.isFalling = false;
+                balloon.isSafe = false;
+                balloon.isTouched = false;
+                this.foudre.visible = false;
+            }
         }
 
     });
