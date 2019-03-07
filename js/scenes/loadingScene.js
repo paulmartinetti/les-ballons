@@ -43,17 +43,31 @@ loadingScene.preload = function () {
 
     },this);
 
+    // balloon colors
+    this.colorsA = ['violet', 'rouge', 'vert', 'jaune', 'orange'];
 
     // load assets (can be accessed from different scenes)
     this.load.image('ciel', 'assets/images/ciel.png');
     this.load.image('terre', 'assets/images/terre2.png');
     this.load.image('nuage', 'assets/images/nuage.png');
     //this.load.image('foudre', 'assets/images/foudre.png');
-    this.load.image('violet', 'assets/images/violet.png');
-    this.load.image('jaune', 'assets/images/jaune.png');
-    this.load.image('orange', 'assets/images/orange.png');
-    this.load.image('vert', 'assets/images/vert.png');
-    this.load.image('rouge', 'assets/images/rouge.png');
+    //this.load.image('violet', 'assets/images/violet.png');
+    //this.load.image('jaune', 'assets/images/jaune.png');
+    //this.load.image('orange', 'assets/images/orange.png');
+    //this.load.image('vert', 'assets/images/vert.png');
+    //this.load.image('rouge', 'assets/images/rouge.png');
+
+    for (let i=0;i<this.colorsA.length;i++){
+        this.load.spritesheet(this.colorsA[i], 'assets/images/'+this.colorsA[i]+'Sprite.png', {
+            frameWidth: 283,
+            frameHeight: 519,
+            startFrame: 0,
+            endFrame: 3,
+            margin: 1,
+            spacing: 1,
+            frameNum: 0
+        });
+    }
 
     //https://github.com/photonstorm/phaser/blob/master/src/textures/parsers/SpriteSheet.js
     // need to turn -90 degrees

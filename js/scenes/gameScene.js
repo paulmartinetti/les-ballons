@@ -43,6 +43,7 @@ gameScene.init = function () {
 
     // balloon states
     this.isFlying = false;
+    this.isSafe = false;
     this.isTouched = false;
     // set by y
     this.isOffGround = false;
@@ -60,7 +61,7 @@ gameScene.create = function () {
     //nuage.depth = 100;
 
     // add color selector
-    let colors = this.add.sprite(29.5, this.gameH-300, 'colors', 4).setInteractive().setDepth(101);
+    let colors = this.add.sprite(29.5, this.gameH - 300, 'colors', 4).setInteractive().setDepth(101);
     //colors.angle = -90;this.gameW / 2this.gameH - 29.5
     colors.on('pointerdown', function (pointer, localX, localY) {
         let step = 58;
@@ -86,7 +87,7 @@ gameScene.create = function () {
         // user adds balloons one at a time - 283w x 519h
         //let balloon = this.add.sprite(localX, localY, this.colorsA[this.curColorInd]);
         // setOrigin(bottom middle);
-        let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd]).setOrigin(0.5,0.9);
+        let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd], 0).setOrigin(0.5, 0.9);
         //console.log(balloon.y);
         // depth is greater closer
         balloon.setDepth(this.setup.minDepth);
@@ -96,6 +97,7 @@ gameScene.create = function () {
         balloon.speed = this.setup.minSpeed +
             closenessPct * (this.setup.maxSpeed - this.setup.minSpeed);
         // starting off FF
+        balloon.isSafe = false;
         balloon.isFlying = false;
         balloon.isTouched = false;
         balloon.isOffGround = false;
@@ -106,38 +108,48 @@ gameScene.create = function () {
         // set interactive.
         balloon.setInteractive();
         balloon.on('pointerdown', this.liftOff);
-    },this);
+    }, this);
 };
 gameScene.liftOff = function () {
+   
+    // first click
     this.isFlying = true;
-    // if FF, make TF
-    if (!this.isFlying && !this.isTouched) {
-        this.isFlying = true;
-        return;
+
+    // clicks when safe sets float
+    if (this.isSafe && !this.isTouched) {
+        this.isTouched = true;
     }
-    // if safe make TT
-    let bRect = this.getBounds();
-    let tRect = this.scene.terre.getBounds();
-    if (this.isFlying && !this.isTouched && 
-        !Phaser.Geom.Intersects.RectangleToRectangle(bRect, tRect)) this.isTouched = true;
 };
 
 gameScene.update = function () {
 
     this.balloonA.forEach(balloon => {
         //console.log(this.balloonA.length);
+
         // if too high, reset
         if (balloon.y < -1000) balloon.isFlying = balloon.isTouched = false;
 
-        // TF
-        if (balloon.isFlying && !balloon.isTouched) {
-            // to make math easier, make upper left balloon origins
+        // balloon is flying but not safe, just go up
+        if (balloon.isFlying && !balloon.isSafe) {
+            // check for safety
             balloon.y -= balloon.speed;
-            
+            let bRect = balloon.getBounds();
+            let tRect = this.terre.getBounds();
+            if (!Phaser.Geom.Intersects.RectangleToRectangle(bRect, tRect)) {
+                balloon.isSafe = true;
+                balloon.setFrame(1);
+            } 
+
+        }
+        // if safe make TT
+        // balloon is flying but not safe, just go up
+        if (balloon.isFlying && balloon.isSafe && !balloon.isTouched) {
+            // check for safety
+            balloon.y -= balloon.speed;
         }
 
         // TT
-        if (balloon.isFlying && balloon.isTouched) {
+        if (balloon.isFlying && balloon.isSafe && balloon.isTouched) {
             // to make math easier, make upper left balloon origins
             balloon.y -= this.float.speed;
             balloon.setDepth(5);
