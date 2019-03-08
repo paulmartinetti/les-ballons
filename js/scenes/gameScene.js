@@ -44,7 +44,7 @@ gameScene.init = function () {
     // balloon states
     this.isFlying = false;
     this.isSafe = false;
-    this.isTouched = false;
+    this.isFloating = false;
     // set by y
     this.isFalling = false;
 
@@ -58,8 +58,21 @@ gameScene.create = function () {
 
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
+    //
     this.foudre = this.add.sprite(this.gameW / 2, 100, 'foudre').setDepth(99);
-    this.foudre.visible = false;
+    this.foudre.alpha = 0;
+    // transparency tween (transitioning alpha)
+    this.foudre.alphaTween = this.tweens.add({
+        targets: this.foudre,
+        alpha: 1,
+        duration: 100,
+        repeat: 3,
+        onComplete: function () {
+            this.foudre.alpha = 0;
+        },
+        onCompleteScope: this,
+        paused: true
+    });
     //nuage.depth = 100;
 
     // add color selector
@@ -101,7 +114,7 @@ gameScene.create = function () {
         // starting off FF
         balloon.isSafe = false;
         balloon.isFlying = false;
-        balloon.isTouched = false;
+        balloon.isFloating = false;
         balloon.isFalling = false;
 
         // add to group
@@ -122,18 +135,15 @@ gameScene.liftOff = function () {
 
 
     // clicks when safe sets float
-    if (this.isSafe && !this.isTouched) {
-        this.isTouched = true;
+    if (this.isSafe && !this.isFloating) {
+        this.isFloating = true;
     }
 };
 
 gameScene.update = function () {
 
-    this.balloonA.forEach(balloon => {
-        //console.log(this.balloonA.length);
-
-        // if too high, reset
-        if (balloon.y < -1000) balloon.isFlying = balloon.isTouched = false;
+    //this.balloonA.forEach(balloon => {
+    for (let balloon of this.balloonA) {
 
         // balloon is flying but not safe, just go up
         if (balloon.isFlying && !balloon.isSafe) {
@@ -145,22 +155,27 @@ gameScene.update = function () {
                 balloon.isSafe = true;
                 balloon.setFrame(1);
             }
-
         }
         // if safe make TT
         // balloon is flying but not safe, just go up
-        if (balloon.isFlying && balloon.isSafe && !balloon.isTouched) {
+        if (balloon.isFlying && balloon.isSafe && !balloon.isFloating && !balloon.isFalling) {
             // check for safety
             balloon.y -= balloon.speed;
             // but if user ignores balloon --
             if (balloon.y < 300) {
+                this.foudre.x = balloon.x;
+                this.foudre.alphaTween.restart();
                 balloon.isFalling = true;
-                this.foudre.visible = true;
+                balloon.isFlying = false;
+                balloon.isFloating = false;
+                // prevents restart during fall
+                balloon.isSafe = false;
+                //this.foudre.visible = true;
             }
         }
 
         // TT
-        if (balloon.isFlying && balloon.isSafe && balloon.isTouched) {
+        if (balloon.isFlying && balloon.isSafe && balloon.isFloating) {
             // to make math easier, make upper left balloon origins
             balloon.y -= this.float.speed;
             balloon.setDepth(5);
@@ -178,11 +193,13 @@ gameScene.update = function () {
                 balloon.isFlying = false;
                 balloon.isFalling = false;
                 balloon.isSafe = false;
-                balloon.isTouched = false;
-                this.foudre.visible = false;
+                balloon.isFloating = false;
+                //this.foudre.visible = false;
             }
         }
-
-    });
-
+        // if too high, reset
+        if (balloon.y < -1000) {
+            balloon.isFlying = balloon.isFloating = false;
+        }
+    }
 };

@@ -1,25 +1,88 @@
-﻿Ballons concept 22feb19 - LesBallons
-1. Principe v1
-   1. Des ballons de toutes couleurs se lèvent spontanément du paysage au cieux
-   2. Il y a des nuages orageux dans le ciel
-   3. Le joueur appuie sur les ballons pour les faire éviter les orages
-   4. The user clicks the balloons to push them out into the distance to avoid the storm
-1. Destinée pour
-   1. Mobile
-1. Les dessins / les contrôles
-   1. Les ballons sont les boutons
-   2. 1. Game mechanics
-   1. Lorsque le joueur appuie 
-   2. Niveaux
-      1. Ciel bleu - 0
-      2. Ballons en levant 5-99
-      3. Pelouse - 100
-      4. Ballons qui tombent 102+
-      5. Nuages - 200
-   1. 1. Assets
-   1. Un ciel bleu - bg
-   2. Un paysage vert - tapis
-   3. Un nuage orageux
-1. Autres idées de jeux
-   1. Clean up the couscous / quinoa
-   2.
+﻿Ballons concept 25feb19 - LesBallons
+1.	Principe v1
+a.	Des ballons de toutes couleurs se lèvent spontanément du paysage au cieux
+b.	Il y a des nuages orageux dans le ciel proche
+c.	Le joueur appuie sur les ballons
+d.	Un relâchant, un ballon va au loin et évite les orages
+2.	Principe v2
+a.	On a du gazon, le ciel, et un nuage
+b.	On choisit une couleur
+c.	On appuie sur le gazon pour créer un ballon
+d.	On clique sur le ballon pour le faire décoller
+e.	Une fois au dessus du gazon, le ballon change état et on peut le cliquer pour le pousser au loin
+f.	Si on laisse le ballon se lève, au niveau du nuage, de la foudre va le faire tomber
+g.	Après avoir tombé, le ballon reste sur le gazon état 3
+h.	On peut le cliquer pour recommencer
+3.	Destinée pour
+a.	Mobile - iPhone SE 1136 x 640
+4.	Les dessins / les contrôles
+a.	Les ballons sont les boutons
+b.	
+5.	Game mechanics
+a.	Lorsque le joueur appuie 
+b.	Niveaux
+i.	Ciel bleu - 0
+ii.	Ballons en levant 5-99
+iii.	Pelouse - 100
+iv.	Ballons qui tombent 102+
+v.	Nuages - 200
+c.	
+6.	Assets et profondeur ( zéro = le plus profond )
+a.	Un ciel bleu, bg, 0
+b.	Un paysage vert, terre, 50
+c.	Ballons, sprite
+i.	0 - nouveau
+ii.	1 - safe
+iii.	2 - tombant
+iv.	3 - tombé
+d.	Un nuage orageux, nuage, 100
+7.	Changement d’état
+a.	nouveau ballon
+i.	frame 0
+ii.	click pour décoller
+iii.	isFlying = false
+iv.	isSafe = false
+v.	isFloating = false
+vi.	isFalling = false
+b.	ballon démarré
+i.	y --
+ii.	check for safe
+iii.	isFlying = true
+iv.	isSafe = false
+v.	isFloating = false
+vi.	isFalling = false
+c.	ballon au dessus du gazon
+i.	y --
+ii.	frame 1
+iii.	check for dans nuage
+iv.	click pour s’en va
+v.	isFlying = true
+vi.	isSafe = true -- ajoute dans if()
+vii.	isFloating = false
+viii.	isFalling = false
+d.	ballon s’en va
+i.	y -- float
+ii.	check for hors de vu
+iii.	isFlying = true
+iv.	isSafe = true
+v.	isFloating = true
+vi.	isFalling = false
+e.	ballon dans nuage
+i.	frame 2
+ii.	isFlying = false
+iii.	isSafe = false
+iv.	isFloating = false
+v.	isFalling = true - ajoute à click
+f.	ballon tombé
+i.	frame 3
+ii.	click pour décoller
+iii.	isFlying = false
+iv.	isSafe = false
+v.	isFloating = false
+vi.	isFalling = false
+g.	ballon relancé
+i.	nouveau ballon ^^
+8.	Autres idées de jeux
+a.	Clean up the couscous / quinoa
+b.	
+
