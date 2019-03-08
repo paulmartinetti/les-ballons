@@ -51,11 +51,9 @@ loadingScene.preload = function () {
     this.load.image('terre', 'assets/images/terre2.png');
     this.load.image('nuage', 'assets/images/nuage.png');
     this.load.image('foudre', 'assets/images/foudre.png');
-    //this.load.image('violet', 'assets/images/violet.png');
-    //this.load.image('jaune', 'assets/images/jaune.png');
-    //this.load.image('orange', 'assets/images/orange.png');
-    //this.load.image('vert', 'assets/images/vert.png');
-    //this.load.image('rouge', 'assets/images/rouge.png');
+  
+    // load sounds
+    this.load.audio('pop1','assets/audio/pop1.mp3');
 
     for (let i=0;i<this.colorsA.length;i++){
         this.load.spritesheet(this.colorsA[i], 'assets/images/'+this.colorsA[i]+'Sprite.png', {

@@ -51,6 +51,9 @@ gameScene.init = function () {
     // balloons
     this.balloonA = [];
 
+    // sounds
+    this.popSound = this.sound.add('pop1');
+
 };
 
 // executed once, after assets were loaded
@@ -172,8 +175,11 @@ gameScene.update = function () {
                 // lightning
                 this.foudre.x = balloon.x;
                 this.foudre.alphaTween.restart();
-                // prevents restart during fall
+                // sound
+                this.popSound.play();
+                // update state to falling
                 balloon.isFalling = true;
+                // prevent click changes while falling
                 balloon.isFlying = false;
                 balloon.isFloating = false;
                 balloon.isSafe = false;
