@@ -39,13 +39,13 @@ gameScene.init = function () {
 
     // balloon colors
     this.colorsA = ['violet', 'rouge', 'vert', 'jaune', 'orange'];
+    // store current color
     this.curColorInd = 4;
 
-    // balloon states
+    // balloon states - checked at click and flying
     this.isFlying = false;
     this.isSafe = false;
     this.isFloating = false;
-    // set by y
     this.isFalling = false;
 
     // balloons
@@ -58,7 +58,8 @@ gameScene.create = function () {
 
     // load clouds - not interactive yet
     let nuage = this.add.sprite(this.gameW / 2, 0, 'nuage').setDepth(100);
-    //
+
+    // lightning flash pops neglected balloons
     this.foudre = this.add.sprite(this.gameW / 2, 100, 'foudre').setDepth(99);
     this.foudre.alpha = 0;
     // transparency tween (transitioning alpha)
@@ -73,13 +74,14 @@ gameScene.create = function () {
         onCompleteScope: this,
         paused: true
     });
-    //nuage.depth = 100;
 
-    // add color selector
+    // add color selector - 57 px diameter circles w 1 px margin
     let colors = this.add.sprite(29.5, this.gameH - 300, 'colors', 4).setInteractive().setDepth(101);
     //colors.angle = -90;this.gameW / 2this.gameH - 29.5
     colors.on('pointerdown', function (pointer, localX, localY) {
+        // including half a margin
         let step = 58;
+
         for (let i = 0; i < this.colorsA.length; i++) {
             //console.log(Math.round(localY) - step);
             if (localY - step < 0) {
@@ -87,14 +89,14 @@ gameScene.create = function () {
                 this.curColorInd = i;
                 break;
             } else {
+                // next color on selector
                 step += 58;
             }
 
         }
     }, this);
 
-    // set bg and make interactive
-    // note two formats for setting depth
+    // set ground and make interactive
     this.terre = this.add.sprite(0, this.gameH - 300, 'terre').setOrigin(0, 0).setDepth(51).setInteractive();
     //terre.depth = 51;
     this.terre.on('pointerdown', function (pointer, localX, localY) {
@@ -104,6 +106,8 @@ gameScene.create = function () {
         // setOrigin(bottom middle);
         let balloon = this.add.sprite(pointer.downX, pointer.downY, this.colorsA[this.curColorInd], 0).setOrigin(0.5, 0.9);
         //console.log(balloon.y);
+        // store original y for after falls
+        balloon.oriY = balloon.y;
         // depth is greater closer
         balloon.setDepth(this.setup.minDepth);
         // scale is greater closer
@@ -117,7 +121,7 @@ gameScene.create = function () {
         balloon.isFloating = false;
         balloon.isFalling = false;
 
-        // add to group
+        // add to group to iterate changes
         this.balloonA.push(balloon);
 
         // set interactive.
@@ -127,7 +131,7 @@ gameScene.create = function () {
 };
 gameScene.liftOff = function () {
 
-    // first click
+    // first click, or rescue click (after fall)
     if (!this.isFlying && !this.isFalling) {
         this.isFlying = true;
         this.setFrame(0);
@@ -142,12 +146,13 @@ gameScene.liftOff = function () {
 
 gameScene.update = function () {
 
-    //this.balloonA.forEach(balloon => {
-    for (let balloon of this.balloonA) {
+    // forEach iterates arrays only
+    // ES6 for-of works as well
+    this.balloonA.forEach(balloon => {
 
         // balloon is flying but not safe, just go up
         if (balloon.isFlying && !balloon.isSafe) {
-            // check for safety
+            // check for safety (no balloon overlap with ground)
             balloon.y -= balloon.speed;
             let bRect = balloon.getBounds();
             let tRect = this.terre.getBounds();
@@ -155,51 +160,54 @@ gameScene.update = function () {
                 balloon.isSafe = true;
                 balloon.setFrame(1);
             }
+            return;
         }
-        // if safe make TT
+        // if safe 1. either click makes it float 2. lightning strike
         // balloon is flying but not safe, just go up
         if (balloon.isFlying && balloon.isSafe && !balloon.isFloating && !balloon.isFalling) {
-            // check for safety
+            // continue same ascent
             balloon.y -= balloon.speed;
-            // but if user ignores balloon --
+            // but if user ignores balloon, goes into clouds
             if (balloon.y < 300) {
+                // lightning
                 this.foudre.x = balloon.x;
                 this.foudre.alphaTween.restart();
+                // prevents restart during fall
                 balloon.isFalling = true;
                 balloon.isFlying = false;
                 balloon.isFloating = false;
-                // prevents restart during fall
                 balloon.isSafe = false;
-                //this.foudre.visible = true;
             }
+            return;
         }
 
-        // TT
+        // floating
         if (balloon.isFlying && balloon.isSafe && balloon.isFloating) {
             // to make math easier, make upper left balloon origins
             balloon.y -= this.float.speed;
             balloon.setDepth(5);
+            // tested various scale values
             balloon.setScale(balloon.scaleX * 0.999);
-            //console.log('2nd');
+            return;
         }
-        // falling animation
+        // manual falling animation
         if (balloon.isFalling) {
-            // check for safety
             balloon.setFrame(2);
             balloon.y += 3;
             // once it hits ground
-            if (balloon.y > 950) {
+            if (balloon.y > balloon.oriY) {
+                // waiting to be saved
                 balloon.setFrame(3);
                 balloon.isFlying = false;
                 balloon.isFalling = false;
                 balloon.isSafe = false;
                 balloon.isFloating = false;
-                //this.foudre.visible = false;
             }
+            return;
         }
-        // if too high, reset
-        if (balloon.y < -1000) {
+        // if it floats away, stop moving it
+        if (balloon.y < -800) {
             balloon.isFlying = balloon.isFloating = false;
         }
-    }
+    });
 };

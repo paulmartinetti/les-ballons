@@ -4,6 +4,7 @@ a.	Des ballons de toutes couleurs se lèvent spontanément du paysage au cieux
 b.	Il y a des nuages orageux dans le ciel proche
 c.	Le joueur appuie sur les ballons
 d.	Un relâchant, un ballon va au loin et évite les orages
+
 2.	Principe v2
 a.	On a du gazon, le ciel, et un nuage
 b.	On choisit une couleur
@@ -13,29 +14,30 @@ e.	Une fois au dessus du gazon, le ballon change état et on peut le cliquer pou
 f.	Si on laisse le ballon se lève, au niveau du nuage, de la foudre va le faire tomber
 g.	Après avoir tombé, le ballon reste sur le gazon état 3
 h.	On peut le cliquer pour recommencer
+
 3.	Destinée pour
 a.	Mobile - iPhone SE 1136 x 640
+
 4.	Les dessins / les contrôles
 a.	Les ballons sont les boutons
-b.	
+
+
 5.	Game mechanics
 a.	Lorsque le joueur appuie 
 b.	Niveaux
-i.	Ciel bleu - 0
-ii.	Ballons en levant 5-99
-iii.	Pelouse - 100
-iv.	Ballons qui tombent 102+
-v.	Nuages - 200
-c.	
+Depths
+*  1. nuage - 100
+*  2. ballons attérris / s'élèvent - 52-70
+*  3. terre - 51
+*  4. ballons s'eloignent 50-0
+
 6.	Assets et profondeur ( zéro = le plus profond )
-a.	Un ciel bleu, bg, 0
-b.	Un paysage vert, terre, 50
 c.	Ballons, sprite
 i.	0 - nouveau
 ii.	1 - safe
 iii.	2 - tombant
 iv.	3 - tombé
-d.	Un nuage orageux, nuage, 100
+
 7.	Changement d’état
 a.	nouveau ballon
 i.	frame 0
@@ -82,6 +84,7 @@ v.	isFloating = false
 vi.	isFalling = false
 g.	ballon relancé
 i.	nouveau ballon ^^
+
 8.	Autres idées de jeux
 a.	Clean up the couscous / quinoa
 b.	
