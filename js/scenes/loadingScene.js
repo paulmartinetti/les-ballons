@@ -54,6 +54,8 @@ loadingScene.preload = function () {
   
     // load sounds
     this.load.audio('pop1','assets/audio/pop1.mp3');
+    this.load.audio('fff', 'assets/audio/fff.mp3');
+    this.load.audio('land', 'assets/audio/BasketLand.mp3');
 
     for (let i=0;i<this.colorsA.length;i++){
         this.load.spritesheet(this.colorsA[i], 'assets/images/'+this.colorsA[i]+'Sprite.png', {

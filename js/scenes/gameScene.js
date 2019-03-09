@@ -53,6 +53,8 @@ gameScene.init = function () {
 
     // sounds
     this.popSound = this.sound.add('pop1');
+    this.fff = this.sound.add('fff');
+    this.land = this.sound.add('land');
 
 };
 
@@ -132,12 +134,14 @@ gameScene.create = function () {
         balloon.on('pointerdown', this.liftOff);
     }, this);
 };
+// context = balloon spritesheet
 gameScene.liftOff = function () {
 
     // first click, or rescue click (after fall)
     if (!this.isFlying && !this.isFalling) {
         this.isFlying = true;
         this.setFrame(0);
+        this.scene.fff.play();
     }
 
 
@@ -204,6 +208,8 @@ gameScene.update = function () {
             if (balloon.y > balloon.oriY) {
                 // waiting to be saved
                 balloon.setFrame(3);
+                // sound
+                this.land.play();
                 balloon.isFlying = false;
                 balloon.isFalling = false;
                 balloon.isSafe = false;
