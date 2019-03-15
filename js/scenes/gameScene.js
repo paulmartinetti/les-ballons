@@ -42,12 +42,6 @@ gameScene.init = function () {
     // store current color
     this.curColorInd = 4;
 
-    // balloon states - checked at click and flying
-    this.isFlying = false;
-    this.isSafe = false;
-    this.isFloating = false;
-    this.isFalling = false;
-
     // balloons
     this.balloonA = [];
 
@@ -120,12 +114,8 @@ gameScene.create = function () {
         // set speed greater is closer
         balloon.speed = this.setup.minSpeed +
             closenessPct * (this.setup.maxSpeed - this.setup.minSpeed);
-        // starting off FF
-        balloon.isSafe = false;
-        balloon.isFlying = false;
-        balloon.isFloating = false;
-        balloon.isFalling = false;
-
+        // starting off
+        balloon.state=0;
         // add to group to iterate changes
         this.balloonA.push(balloon);
 
@@ -134,23 +124,29 @@ gameScene.create = function () {
         balloon.on('pointerdown', this.liftOff);
     }, this);
 };
-// context = balloon spritesheet
+/* balloon states - checked at click and flying
+* switched from boolean to integer because frequent updating, less code
+- 0 new balloon / fallen balloon
+- 1 liftoff
+- 2 safe to float
+- 3 floating
+- 4 falling
+- 5 gone
+*/
+// context = user touch = balloon spritesheet
 gameScene.liftOff = function () {
 
     // first click, or rescue click (after fall)
-    if (!this.isFlying && !this.isFalling) {
-        this.isFlying = true;
+    if (this.state==0) {
+        this.state=1;
         this.setFrame(0);
         this.scene.fff.play();
     }
 
-
     // clicks when safe sets float
-    if (this.isSafe && !this.isFloating) {
-        this.isFloating = true;
-    }
+    if (this.state == 2) this.state = 3;
 };
-
+// context - scene
 gameScene.update = function () {
 
     // forEach iterates arrays only
@@ -158,20 +154,20 @@ gameScene.update = function () {
     this.balloonA.forEach(balloon => {
 
         // balloon is flying but not safe, just go up
-        if (balloon.isFlying && !balloon.isSafe) {
+        if (balloon.state == 1) {
             // check for safety (no balloon overlap with ground)
             balloon.y -= balloon.speed;
             let bRect = balloon.getBounds();
             let tRect = this.terre.getBounds();
             if (!Phaser.Geom.Intersects.RectangleToRectangle(bRect, tRect)) {
-                balloon.isSafe = true;
+                balloon.state=2;
                 balloon.setFrame(1);
             }
             return;
         }
         // if safe 1. either click makes it float 2. lightning strike
         // balloon is flying but not safe, just go up
-        if (balloon.isFlying && balloon.isSafe && !balloon.isFloating && !balloon.isFalling) {
+        if (balloon.state == 2) {
             // continue same ascent
             balloon.y -= balloon.speed;
             // but if user ignores balloon, goes into clouds
@@ -182,17 +178,13 @@ gameScene.update = function () {
                 // sound
                 this.popSound.play();
                 // update state to falling
-                balloon.isFalling = true;
-                // prevent click changes while falling
-                balloon.isFlying = false;
-                balloon.isFloating = false;
-                balloon.isSafe = false;
+                balloon.state = 4;
             }
             return;
         }
 
         // floating
-        if (balloon.isFlying && balloon.isSafe && balloon.isFloating) {
+        if (balloon.state==3) {
             // to make math easier, make upper left balloon origins
             balloon.y -= this.float.speed;
             balloon.setDepth(5);
@@ -201,7 +193,7 @@ gameScene.update = function () {
             return;
         }
         // manual falling animation
-        if (balloon.isFalling) {
+        if (balloon.state == 4) {
             balloon.setFrame(2);
             balloon.y += 3;
             // once it hits ground
@@ -210,16 +202,13 @@ gameScene.update = function () {
                 balloon.setFrame(3);
                 // sound
                 this.land.play();
-                balloon.isFlying = false;
-                balloon.isFalling = false;
-                balloon.isSafe = false;
-                balloon.isFloating = false;
+                balloon.state=0;
             }
             return;
         }
         // if it floats away, stop moving it
         if (balloon.y < -800) {
-            balloon.isFlying = balloon.isFloating = false;
+            balloon.state=5;
         }
     });
 };
